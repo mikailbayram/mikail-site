@@ -1,4 +1,8 @@
 import type { CaseStudy } from '../case-study';
+import gaps from '../../assets/work/fathom/gaps.png';
+import pipeline from '../../assets/work/fathom/scan-pipeline.png';
+import finding from '../../assets/work/fathom/finding.png';
+import chatbot from '../../assets/work/fathom/chatbot.png';
 import leads from '../../assets/work/fathom/leads.png';
 
 export const fathom: CaseStudy = {
@@ -45,6 +49,10 @@ export const fathom: CaseStudy = {
     },
   ],
   screens: [
-    { src: leads, alt: 'Leads list with scan status, pages crawled and gaps found', caption: 'Each lead is one company. Scans run in the background and report pages crawled, claims tested and gaps found.', url: 'localhost:3000/leads' },
+    { src: gaps, alt: 'Scan results for solution404.io: 30 URLs mapped, 21 pages analysed, 217 passages indexed, 7 ranked gaps', caption: 'A real scan of solution404.io, the studio I build with. 30 URLs mapped, 21 pages read and 217 passages indexed for $0.45. The gaps are ranked by friction score, highest first.', url: 'localhost:3000/leads/3' },
+    { src: pipeline, alt: 'Scan tab showing each pipeline stage with its result, next to the crawl plan', caption: 'The Scan tab shows each stage and what it produced. The crawl plan on the right is why the scan is cheap: of 30 URLs found, 23 are eligible and 7 are skipped as low value before anything is fetched.', url: 'localhost:3000/leads/3' },
+    { src: finding, alt: 'A finding comparing what the buyer-visible site says with what the deep content says, with the source page', caption: 'One finding, side by side: what the buyer-facing pages say against what the deeper content says, with the source page and how hard the answer is to find.', url: 'localhost:3000/findings/139' },
+    { src: chatbot, alt: 'Public demo chatbot answering questions about Solution404 with linked sources', caption: 'The shareable chatbot. When the site doesn\'t publish an answer, it says so and offers to pass the question on, rather than guessing. Every answer links the pages it used.', url: 'localhost:3000/d/solution404-c0422d' },
+    { src: leads, alt: 'Leads list with scan status, pages crawled, claims tested and gaps found', caption: 'Each lead is one company. Paste a URL and the scan runs in the background.', url: 'localhost:3000/leads' },
   ],
 };
