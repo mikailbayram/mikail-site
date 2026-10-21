@@ -1,12 +1,5 @@
 import type { APIRoute } from 'astro';
-import sharp from 'sharp';
-import { faviconSvg } from '../lib/favicon';
+import { iconPng } from '../lib/favicon';
 
-// iOS home-screen icon. 24px grid × 7.5 = 180px, upscaled without smoothing.
-export const GET: APIRoute = async () => {
-  const png = await sharp(new TextEncoder().encode(faviconSvg()), { density: 72 * 7.5 })
-    .resize(180, 180, { kernel: 'nearest' })
-    .png()
-    .toBuffer();
-  return new Response(new Uint8Array(png), { headers: { 'Content-Type': 'image/png' } });
-};
+// iOS ignores SVG favicons and wants a 180px PNG.
+export const GET: APIRoute = async () => new Response(await iconPng(180), { headers: { 'Content-Type': 'image/png' } });

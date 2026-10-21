@@ -19,7 +19,7 @@ const link = p.url ?? p.repo;
 const host = link ? new URL(link).host + (p.repo ? new URL(link).pathname : '') : null;
 ---
 
-<Base title={`${p.name} · Mikail Bayram`} description={`${p.name}: ${p.oneLiner}. ${s.overview[0]}`} path={`~/work/${p.slug}`}>
+<Base title={`${p.name} · Mikail Bayram`} description={`${p.name}: ${p.oneLiner}. ${s.overview[0]}`} path={`~/work/${p.slug}`} type="article">
   <div class:list={['banner', `motif-${p.motif}`]} aria-hidden="true"></div>
   <article class="wrap">
     <a class="back mono" href="/#work">← cd ..</a>

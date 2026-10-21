@@ -8,14 +8,29 @@ interface Props {
   title?: string;
   description?: string;
   path?: string;
+  type?: 'website' | 'article';
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown>;
 }
 
 const {
   title = 'Mikail Bayram · Full-stack AI engineer',
   description = 'Full-stack AI engineer from Sarajevo. I take startup ideas from first prototype to production, design included.',
   path,
+  type = 'website',
+  noindex = false,
+  jsonLd,
 } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+
+// Search snippets cut off around 155 characters; end on a word.
+const metaDescription = description.length <= 155 ? description : description.slice(0, 152).replace(/\s+\S*$/, '') + '…';
+
+// Share image built by src/pages/og/[...path].png.ts for this page.
+const page = Astro.url.pathname.replace(/^\/|\/$/g, '');
+const ogPath = page === '' || page === '404' ? 'home' : page;
+const ogImage = new URL(`/og/${ogPath}.png`, Astro.site);
+const ogAlt = `${title.split(' · ')[0]}: share card with the ćilim border and a pixel-art portrait of Mikail`;
 ---
 
 <!doctype html>
@@ -24,16 +39,34 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
-    <meta name="description" content={description} />
+    <meta name="description" content={metaDescription} />
+    <meta name="author" content="Mikail Bayram" />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#f3eadb" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#12152e" media="(prefers-color-scheme: dark)" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Mikail Bayram" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content={type} />
     <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={metaDescription} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={ogAlt} />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
     <script is:inline>
       // Apply a theme chosen with `theme dark|light` before first paint.
       try {

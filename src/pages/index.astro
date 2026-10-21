@@ -8,9 +8,28 @@ import AskDock from '../components/AskDock.astro';
 import { featured, projects } from '../data/projects';
 
 const more = projects.filter((p) => !p.featured);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Person',
+      '@id': 'https://mikailbayram.com/#me',
+      name: 'Mikail Bayram',
+      url: 'https://mikailbayram.com',
+      image: 'https://mikailbayram.com/icon-512.png',
+      jobTitle: 'Full-stack AI engineer',
+      email: 'mailto:mikail@solution404.io',
+      address: { '@type': 'PostalAddress', addressLocality: 'Sarajevo', addressCountry: 'BA' },
+      knowsAbout: ['Full-stack development', 'Ruby on Rails', 'React', 'TypeScript', 'Node.js', 'LLM applications', 'RAG', 'Design systems'],
+      sameAs: ['https://github.com/mikailbayram', 'https://linkedin.com/in/mikail-bayram'],
+    },
+    { '@type': 'WebSite', '@id': 'https://mikailbayram.com/#site', url: 'https://mikailbayram.com', name: 'Mikail Bayram', author: { '@id': 'https://mikailbayram.com/#me' } },
+  ],
+};
 ---
 
-<Base>
+<Base jsonLd={jsonLd}>
   <section class="wrap hero">
     <div class="copy">
       <h1>Mikail<br />Bayram<span>.</span></h1>
