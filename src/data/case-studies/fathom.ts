@@ -3,6 +3,8 @@ import gaps from '../../assets/work/fathom/gaps.png';
 import pipeline from '../../assets/work/fathom/scan-pipeline.png';
 import finding from '../../assets/work/fathom/finding.png';
 import chatbot from '../../assets/work/fathom/chatbot.png';
+import snippet from '../../assets/work/fathom/demo-snippet.png';
+import widget from '../../assets/work/fathom/widget.png';
 import leads from '../../assets/work/fathom/leads.png';
 
 export const fathom: CaseStudy = {
@@ -53,6 +55,8 @@ export const fathom: CaseStudy = {
     { src: pipeline, alt: 'Scan tab showing each pipeline stage with its result, next to the crawl plan', caption: 'The Scan tab shows each stage and what it produced. The crawl plan on the right is why the scan is cheap: of 30 URLs found, 23 are eligible and 7 are skipped as low value before anything is fetched.', url: 'localhost:3000/leads/3' },
     { src: finding, alt: 'A finding comparing what the buyer-visible site says with what the deep content says, with the source page', caption: 'One finding, side by side: what the buyer-facing pages say against what the deeper content says, with the source page and how hard the answer is to find.', url: 'localhost:3000/findings/139' },
     { src: chatbot, alt: 'Public demo chatbot answering questions about Solution404 with linked sources', caption: 'The shareable chatbot. When the site doesn\'t publish an answer, it says so and offers to pass the question on, rather than guessing. Every answer links the pages it used.', url: 'localhost:3000/d/solution404-c0422d' },
+    { src: snippet, alt: 'Demo tab with a one-line script snippet and a copy button, above a preview of the chatbot', caption: 'The Demo tab. Copy the one-line snippet, paste it into the browser console on the prospect\'s own site, and the chatbot appears there.', url: 'localhost:3000/leads/3' },
+    { src: widget, alt: 'The Fathom chatbot widget open in the corner of the live solution404.io homepage', caption: 'The snippet running on the live solution404.io homepage. The widget is an iframe, so the host page\'s styles can\'t break it.', url: 'solution404.io' },
     { src: leads, alt: 'Leads list with scan status, pages crawled, claims tested and gaps found', caption: 'Each lead is one company. Paste a URL and the scan runs in the background.', url: 'localhost:3000/leads' },
   ],
 };
