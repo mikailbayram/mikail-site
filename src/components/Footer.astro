@@ -1,0 +1,52 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="mono">
+  <div class="wrap row">
+    <span>43.8590° N, 18.4312° E</span>
+    <span class="links">
+      <a href="https://github.com/mikailbayram">github</a>
+      <a href="https://linkedin.com/in/mikail-bayram">linkedin</a>
+      <a href="mailto:mikail@solution404.io">mail</a>
+    </span>
+    <span>© {year} Mikail Bayram</span>
+  </div>
+</footer>
+
+<style>
+  footer {
+    border-top: var(--rule) solid var(--ink);
+    font-size: 11px;
+    margin-top: 56px;
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: 16px max(16px, env(safe-area-inset-bottom));
+  }
+  .links {
+    display: flex;
+    gap: 4px;
+  }
+  .links a {
+    padding: 8px;
+    text-decoration: none;
+  }
+  .links a:hover {
+    color: var(--red);
+  }
+  @media (max-width: 680px) {
+    footer {
+      margin-top: 40px;
+      padding-bottom: 76px; /* room for the ask dock */
+    }
+    .row {
+      justify-content: center;
+      text-align: center;
+    }
+  }
+</style>

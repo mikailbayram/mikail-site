@@ -1,0 +1,109 @@
+---
+import Base from '../layouts/Base.astro';
+import Portrait from '../components/Portrait.astro';
+import Terminal from '../components/Terminal.astro';
+import Bridge from '../components/Bridge.astro';
+import ProjectTiles from '../components/ProjectTiles.astro';
+import AskDock from '../components/AskDock.astro';
+import { featured, projects } from '../data/projects';
+
+const more = projects.filter((p) => !p.featured);
+---
+
+<Base>
+  <section class="wrap hero">
+    <div class="copy">
+      <h1>Mikail<br />Bayram<span>.</span></h1>
+      <p class="tag">
+        Full-stack AI engineer from Sarajevo. I take startup ideas from <em>first prototype</em> to production, design included.
+      </p>
+    </div>
+    <Portrait class="me" />
+  </section>
+
+  <div class="wrap">
+    <Terminal />
+  </div>
+
+  <section class="wrap sec" aria-labelledby="how">
+    <p class="kick">// how I work</p>
+    <h2 id="how" class="h2">From prototype to production.</h2>
+    <p class="sub">I'm the bridge between the two. I shape the idea with founders, design it, build the frontend and backend, and run it.</p>
+    <Bridge />
+  </section>
+
+  <section id="work" class="wrap sec" aria-labelledby="work-h">
+    <p class="kick">// ~/work</p>
+    <h2 id="work-h" class="h2">Shipped.</h2>
+    <p class="sub">Products in production right now.</p>
+    <ProjectTiles items={featured} />
+    <h3 class="h3">Also</h3>
+    <ProjectTiles items={more} />
+  </section>
+
+  <AskDock />
+</Base>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: end;
+    padding-top: clamp(24px, 5vw, 56px);
+    padding-bottom: 22px;
+  }
+  h1 {
+    font-weight: 800;
+    font-size: clamp(50px, 11vw, 120px);
+    line-height: 0.84;
+    letter-spacing: -0.05em;
+    margin: 0 0 18px;
+    font-variation-settings: 'opsz' 96;
+  }
+  h1 span {
+    color: var(--red);
+  }
+  .tag {
+    font-size: clamp(15px, 1.8vw, 18px);
+    line-height: 1.5;
+    color: var(--soft);
+    max-width: 30em;
+    margin: 0 0 8px;
+  }
+  .tag em {
+    font-style: normal;
+    background: var(--ochre);
+    color: var(--px-ink);
+    padding: 0 4px;
+  }
+  .hero :global(.me) {
+    margin-bottom: 10px;
+  }
+  .sec {
+    padding-top: clamp(44px, 7vw, 80px);
+  }
+  .h3 {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--soft);
+    margin: 28px 0 12px;
+  }
+
+  @media (max-width: 680px) {
+    .hero {
+      position: relative;
+      display: block;
+    }
+    .hero :global(.me) {
+      position: absolute;
+      top: 20px;
+      right: var(--gutter);
+      width: 92px;
+    }
+    .tag {
+      margin-bottom: 0;
+    }
+  }
+</style>

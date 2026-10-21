@@ -1,0 +1,30 @@
+---
+import { kilimTile, size, toRects } from '../lib/pixels';
+
+const tile = kilimTile();
+const { w, h } = size(tile);
+// Wide enough that the band is never stretched; the height sets the pixel size.
+const span = w * 64;
+---
+
+<svg class="kilim pixel" viewBox={`0 0 ${span} ${h}`} preserveAspectRatio="xMinYMin slice" aria-hidden="true">
+  <defs>
+    <pattern id="kilim-tile" width={w} height={h} patternUnits="userSpaceOnUse">
+      <Fragment set:html={toRects(tile)} />
+    </pattern>
+  </defs>
+  <rect width={span} height={h} fill="url(#kilim-tile)"></rect>
+</svg>
+
+<style>
+  .kilim {
+    display: block;
+    width: 100%;
+    height: 92px; /* 4px per woven pixel */
+  }
+  @media (max-width: 680px) {
+    .kilim {
+      height: 69px; /* 3px per woven pixel */
+    }
+  }
+</style>

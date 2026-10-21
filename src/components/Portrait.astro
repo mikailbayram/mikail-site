@@ -1,0 +1,47 @@
+---
+import PixelArt from './PixelArt.astro';
+import { portrait } from '../lib/pixels';
+
+interface Props {
+  class?: string;
+}
+const { class: cls } = Astro.props;
+---
+
+<figure class:list={['portrait', cls]}>
+  <PixelArt rows={portrait} label="Pixel-art portrait of Mikail: short dark hair, full beard, teal hoodie" />
+</figure>
+
+<style>
+  .portrait {
+    margin: 0;
+    width: clamp(96px, 22vw, 228px);
+    background: var(--ochre);
+    border: 3px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--red);
+    position: relative;
+    padding-top: clamp(8px, 1.6vw, 14px);
+  }
+  /* woven guard stripe along the top edge */
+  .portrait::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: clamp(5px, 1vw, 9px);
+    background: repeating-linear-gradient(90deg, var(--red) 0 8px, var(--paper) 8px 16px);
+    border-bottom: 3px solid var(--ink);
+  }
+  .portrait :global(svg) {
+    width: 100%;
+    height: auto;
+  }
+  @media (max-width: 680px) {
+    .portrait {
+      box-shadow: 4px 4px 0 var(--red);
+      border-width: 2px;
+    }
+    .portrait::before {
+      border-bottom-width: 2px;
+    }
+  }
+</style>

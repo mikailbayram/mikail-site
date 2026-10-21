@@ -1,0 +1,88 @@
+---
+import { Image } from 'astro:assets';
+import type { Screen } from '../data/case-study';
+
+interface Props {
+  shot: Screen;
+  eager?: boolean;
+  sizes?: string;
+}
+const { shot, eager = false, sizes = '(max-width: 760px) 100vw, 880px' } = Astro.props;
+---
+
+<figure class:list={['shot', { narrow: shot.narrow }]}>
+  <div class="frame">
+    <div class="bar mono" aria-hidden="true">
+      <i></i><i></i><i></i>
+      {shot.url && <span>{shot.url}</span>}
+    </div>
+    <Image
+      src={shot.src}
+      alt={shot.alt}
+      widths={[480, 880, 1320, 1760].filter((w) => w <= shot.src.width)}
+      sizes={sizes}
+      loading={eager ? 'eager' : 'lazy'}
+      fetchpriority={eager ? 'high' : undefined}
+    />
+  </div>
+  <figcaption>{shot.caption}</figcaption>
+</figure>
+
+<style>
+  .shot {
+    margin: 0;
+  }
+  .frame {
+    border: var(--rule) solid var(--ink);
+    box-shadow: 6px 6px 0 var(--ochre);
+    background: var(--paper);
+    overflow: hidden;
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border-bottom: var(--rule) solid var(--ink);
+    font-size: 10.5px;
+    color: var(--soft);
+    min-width: 0;
+  }
+  .bar i {
+    width: 9px;
+    height: 9px;
+    flex: none;
+    background: var(--px-ink);
+  }
+  .bar i:nth-child(1) {
+    background: var(--red);
+  }
+  .bar i:nth-child(2) {
+    background: var(--ochre);
+  }
+  .bar span {
+    margin-left: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  figcaption {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--soft);
+    margin-top: 12px;
+  }
+  @media (max-width: 680px) {
+    .frame {
+      box-shadow: 4px 4px 0 var(--ochre);
+    }
+    figcaption {
+      font-size: 13px;
+    }
+  }
+</style>

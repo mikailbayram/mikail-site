@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Not found · Mikail Bayram">
+  <div class="wrap mono box">
+    <p><span class="p">❯</span> cd {Astro.url.pathname}</p>
+    <p class="err">zsh: no such file or directory</p>
+    <p><a href="/">cd ~</a></p>
+  </div>
+</Base>
+
+<style>
+  .box {
+    padding-block: 80px;
+    font-size: 14px;
+  }
+  .p {
+    color: var(--ochre);
+  }
+  .err {
+    color: var(--red);
+  }
+</style>

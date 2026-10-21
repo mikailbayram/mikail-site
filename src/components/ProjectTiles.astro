@@ -1,0 +1,123 @@
+---
+import type { Project } from '../data/projects';
+
+interface Props {
+  items: Project[];
+}
+const { items } = Astro.props;
+---
+
+<ul class="tiles">
+  {
+    items.map((p) => (
+      <li>
+        <a class="tile" href={`/work/${p.slug}`}>
+          <div class:list={['mo', `motif-${p.motif}`]} aria-hidden="true" />
+          <div class="in">
+            <b>{p.name}</b>
+            <small>{p.oneLiner}</small>
+            <code>{p.short}</code>
+          </div>
+          <span class="ar" aria-hidden="true">
+            →
+          </span>
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .tiles {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 14px;
+  }
+  .tile {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: var(--rule) solid var(--ink);
+    background: var(--paper);
+    text-decoration: none;
+    transition:
+      transform 0.15s,
+      box-shadow 0.15s;
+  }
+  .tile:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 5px 5px 0 var(--ink);
+  }
+  .mo {
+    height: 44px;
+    border-bottom: var(--rule) solid var(--ink);
+  }
+  .in {
+    padding: 12px 14px 14px;
+    flex: 1;
+  }
+  b {
+    font-size: 19px;
+    display: block;
+    margin-bottom: 2px;
+  }
+  small {
+    font-size: 13px;
+    color: var(--soft);
+    display: block;
+    margin-bottom: 10px;
+  }
+  code {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--red);
+  }
+  .ar {
+    display: none;
+  }
+
+  /* Phones: stacked rows with the motif as a side strip. */
+  @media (max-width: 680px) {
+    .tiles {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .tile {
+      flex-direction: row;
+      min-height: 76px;
+    }
+    .tile:hover {
+      transform: none;
+      box-shadow: none;
+    }
+    .tile:active {
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+    .mo {
+      height: auto;
+      width: 32px;
+      flex: none;
+      border-bottom: 0;
+      border-right: var(--rule) solid var(--ink);
+    }
+    .in {
+      padding: 11px 12px;
+    }
+    b {
+      font-size: 17px;
+    }
+    small {
+      margin-bottom: 4px;
+    }
+    .ar {
+      display: block;
+      align-self: center;
+      padding: 0 14px;
+      font-size: 18px;
+      color: var(--red);
+    }
+  }
+</style>

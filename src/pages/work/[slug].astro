@@ -1,0 +1,362 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Base from '../../layouts/Base.astro';
+import Shot from '../../components/Shot.astro';
+import { projects, type Project } from '../../data/projects';
+
+export const getStaticPaths = (() =>
+  projects.map((p, i) => ({
+    params: { slug: p.slug },
+    props: { p, next: projects[(i + 1) % projects.length] },
+  }))) satisfies GetStaticPaths;
+
+const { p, next } = Astro.props as { p: Project; next: Project };
+const s = p.study;
+const [hero, ...rest] = s.screens;
+const wide = rest.filter((x) => !x.narrow);
+const narrow = rest.filter((x) => x.narrow);
+const link = p.url ?? p.repo;
+const host = link ? new URL(link).host + (p.repo ? new URL(link).pathname : '') : null;
+---
+
+<Base title={`${p.name} · Mikail Bayram`} description={`${p.name}: ${p.oneLiner}. ${s.overview[0]}`} path={`~/work/${p.slug}`}>
+  <div class:list={['banner', `motif-${p.motif}`]} aria-hidden="true"></div>
+  <article class="wrap">
+    <a class="back mono" href="/#work">← cd ..</a>
+    <h1>{p.name}</h1>
+    <p class="one">{p.oneLiner}</p>
+
+    <dl class="meta mono">
+      <div><dt>role</dt><dd>{p.role}</dd></div>
+      <div><dt>at</dt><dd>{p.where}</dd></div>
+      <div><dt>when</dt><dd>{p.period}</dd></div>
+      {
+        host && (
+          <div>
+            <dt>{p.repo ? 'code' : 'live'}</dt>
+            <dd>
+              <a href={link} rel="noopener">{host} ↗</a>
+            </dd>
+          </div>
+        )
+      }
+    </dl>
+
+    {s.note && <p class="note mono">// {s.note}</p>}
+
+    {hero && <div class="hero"><Shot shot={hero} eager sizes="(max-width: 960px) 100vw, 920px" /></div>}
+
+    <section class="overview">
+      {s.overview.map((t) => <p>{t}</p>)}
+    </section>
+
+
+    {
+      s.architecture && (
+        <section class="sec">
+          <p class="kick">// architecture</p>
+          <div class="arch">
+            <div class="tb mono" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+              <span>architecture.txt</span>
+            </div>
+            <pre class="mono" tabindex="0" aria-label={`${p.name} architecture diagram`}>{s.architecture}</pre>
+          </div>
+        </section>
+      )
+    }
+
+    <section class="sec">
+      <p class="kick">// how it works</p>
+      <ol class="highlights">
+        {
+          s.highlights.map((h) => (
+            <li>
+              <h2>{h.title}</h2>
+              {h.body.map((t) => (
+                <p>{t}</p>
+              ))}
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    {
+      rest.length > 0 && (
+        <section class="sec">
+          <p class="kick">// screens</p>
+          <div class="screens">
+            {wide.map((x) => (
+              <Shot shot={x} />
+            ))}
+            {narrow.length > 0 && (
+              <div class="pair">
+                {narrow.map((x) => (
+                  <Shot shot={x} sizes="(max-width: 760px) 100vw, 440px" />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )
+    }
+
+    <section class="sec">
+      <p class="kick">// stack</p>
+      <ul class="stack mono">
+        {p.stack.map((t) => <li>{t}</li>)}
+      </ul>
+    </section>
+
+    <a class="next" href={`/work/${next.slug}`}>
+      <span class="mono">next ❯</span>
+      <b>{next.name}</b>
+    </a>
+  </article>
+</Base>
+
+<style>
+  .banner {
+    height: clamp(40px, 8vw, 72px);
+    border-bottom: var(--rule) solid var(--ink);
+  }
+  article {
+    max-width: 920px;
+    padding-top: 24px;
+  }
+  .back {
+    display: inline-block;
+    font-size: 12px;
+    padding: 8px 0;
+    text-decoration: none;
+    color: var(--red);
+  }
+  h1 {
+    font-size: clamp(42px, 9vw, 92px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    font-weight: 800;
+    margin: 12px 0 8px;
+    font-variation-settings: 'opsz' 96;
+  }
+  .one {
+    font-size: clamp(17px, 2.4vw, 22px);
+    color: var(--soft);
+    margin: 0 0 24px;
+  }
+  .meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    margin: 0 0 20px;
+    border: var(--rule) solid var(--ink);
+    font-size: 12px;
+  }
+  .meta div {
+    padding: 10px 14px;
+    border-right: var(--rule) solid var(--ink);
+    min-width: 0;
+  }
+  .meta div:last-child {
+    border-right: 0;
+  }
+  .meta a {
+    overflow-wrap: anywhere;
+  }
+  dt {
+    color: var(--red);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  dd {
+    margin: 2px 0 0;
+  }
+  .note {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--soft);
+    margin: 0 0 8px;
+  }
+  .hero {
+    margin: 32px 0 8px;
+  }
+  .overview {
+    margin-top: 36px;
+    max-width: 44em;
+  }
+  .overview p {
+    font-size: clamp(17px, 2vw, 19px);
+    line-height: 1.6;
+    margin: 0 0 16px;
+  }
+  .sec {
+    margin-top: clamp(44px, 7vw, 72px);
+  }
+  .arch {
+    background: var(--term-bg);
+    color: var(--term-fg);
+    border: var(--rule) solid var(--ink);
+    box-shadow: 6px 6px 0 var(--red);
+  }
+  .arch .tb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--paper);
+    color: var(--ink);
+    padding: 6px 10px;
+    border-bottom: var(--rule) solid var(--ink);
+    font-size: 11px;
+  }
+  .arch .tb i {
+    width: 10px;
+    height: 10px;
+    background: var(--px-ink);
+  }
+  .arch .tb i:nth-child(1) {
+    background: var(--red);
+  }
+  .arch .tb i:nth-child(2) {
+    background: var(--ochre);
+  }
+  .arch .tb span {
+    margin-left: 6px;
+  }
+  pre {
+    margin: 0;
+    padding: 18px 20px;
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+  .highlights {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: h;
+  }
+  .highlights li {
+    counter-increment: h;
+    position: relative;
+    padding: 22px 0 22px 64px;
+    border-top: 1px dashed color-mix(in srgb, var(--ink) 35%, transparent);
+  }
+  .highlights li:first-child {
+    border-top: 0;
+    padding-top: 4px;
+  }
+  .highlights li::before {
+    content: counter(h, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 24px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--px-ink);
+    background: var(--ochre);
+    padding: 2px 7px;
+  }
+  .highlights li:first-child::before {
+    top: 6px;
+  }
+  .highlights h2 {
+    font-size: clamp(20px, 2.6vw, 26px);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 10px;
+  }
+  .highlights p {
+    font-size: 16.5px;
+    line-height: 1.65;
+    margin: 0 0 12px;
+    max-width: 42em;
+  }
+  .screens {
+    display: grid;
+    gap: 44px;
+  }
+  .pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+  .stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 11.5px;
+  }
+  .stack li {
+    border: 1.5px solid var(--ink);
+    padding: 5px 9px;
+  }
+  .next {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    margin-top: 56px;
+    border-top: var(--rule) solid var(--ink);
+    border-bottom: var(--rule) solid var(--ink);
+    padding: 18px 0;
+    text-decoration: none;
+  }
+  .next span {
+    font-size: 12px;
+    color: var(--red);
+  }
+  .next b {
+    font-size: clamp(22px, 4vw, 32px);
+    letter-spacing: -0.02em;
+  }
+  .next:hover b {
+    color: var(--red);
+  }
+
+  @media (max-width: 680px) {
+    .meta {
+      grid-template-columns: 1fr 1fr;
+    }
+    .meta div {
+      border-right: 0;
+    }
+    .hero {
+      margin-top: 24px;
+    }
+    pre {
+      font-size: 10.5px;
+      padding: 14px;
+    }
+    .arch {
+      box-shadow: 4px 4px 0 var(--red);
+    }
+    .highlights li {
+      padding-left: 0;
+      padding-top: 48px;
+    }
+    .highlights li:first-child {
+      padding-top: 36px;
+    }
+    .highlights li::before {
+      top: 18px;
+    }
+    .highlights li:first-child::before {
+      top: 4px;
+    }
+    .highlights p {
+      font-size: 16px;
+    }
+    .pair {
+      grid-template-columns: 1fr;
+      gap: 36px;
+    }
+  }
+</style>

@@ -1,0 +1,27 @@
+---
+import { size, toRects, type Grid } from '../lib/pixels';
+
+interface Props {
+  rows: Grid;
+  label?: string;
+  class?: string;
+  width?: number;
+  height?: number;
+}
+
+const { rows, label, class: cls, width, height } = Astro.props;
+const { w, h } = size(rows);
+---
+
+<svg
+  class:list={['pixel', cls]}
+  viewBox={`0 0 ${w} ${h}`}
+  width={width}
+  height={height}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+>
+  <Fragment set:html={toRects(rows)} />
+  <slot />
+</svg>

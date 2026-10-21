@@ -1,0 +1,163 @@
+@import '@fontsource-variable/bricolage-grotesque/opsz.css';
+@import '@fontsource/martian-mono/400.css';
+@import '@fontsource/martian-mono/600.css';
+
+/* Design tokens. The /system page renders these. */
+:root {
+  --paper: #f3eadb;
+  --ink: #1e2552;
+  --red: #b3282d;
+  --ochre: #d9a33a;
+  --soft: #3b3f63;
+  --term-bg: #1e2552;
+  --term-fg: #f3eadb;
+  --term-dim: #9aa0c8;
+  --term-hl: #ff8a7a;
+
+  --px-ink: #1e2552;
+  --px-red: #b3282d;
+  --px-ochre: #d9a33a;
+  --px-paper: #f3eadb;
+  --px-stone: #c9b99a;
+
+  --font-display: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Martian Mono', ui-monospace, monospace;
+
+  --rule: 2px;
+  --gutter: clamp(16px, 4vw, 40px);
+  --max: 1080px;
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --paper: #12152e;
+    --ink: #f0e6d4;
+    --red: #e0544f;
+    --ochre: #e3b04b;
+    --soft: #b9bdd9;
+    --term-bg: #0a0c1d;
+    --px-ink: #5f6bc4;
+    --px-paper: #f0e6d4;
+    --px-stone: #8c7f68;
+    --px-red: #c9393c;
+  }
+}
+:root[data-theme='dark'] {
+  --paper: #12152e;
+  --ink: #f0e6d4;
+  --red: #e0544f;
+  --ochre: #e3b04b;
+  --soft: #b9bdd9;
+  --term-bg: #0a0c1d;
+  --px-ink: #5f6bc4;
+  --px-paper: #f0e6d4;
+  --px-stone: #8c7f68;
+  --px-red: #c9393c;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-display);
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+}
+
+a {
+  color: inherit;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.wrap {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+}
+
+.kick {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin: 0 0 8px;
+}
+
+.h2 {
+  font-size: clamp(26px, 4vw, 40px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+  margin: 0 0 6px;
+}
+
+.sub {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--soft);
+  margin: 0 0 18px;
+}
+
+.pixel {
+  display: block;
+  shape-rendering: crispEdges;
+}
+
+:focus-visible {
+  outline: 3px solid var(--ochre);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Woven motifs, used on project tiles. */
+.motif-diamonds {
+  background: conic-gradient(from 45deg, var(--red) 25%, var(--paper) 0 50%, var(--red) 0 75%, var(--paper) 0) 0 0 / 20px 20px;
+}
+.motif-zigzag {
+  background:
+    linear-gradient(135deg, var(--ink) 25%, transparent 0) 0 0 / 14px 14px,
+    linear-gradient(225deg, var(--ink) 25%, transparent 0) 0 0 / 14px 14px,
+    var(--ochre);
+}
+.motif-stripes {
+  background: repeating-linear-gradient(45deg, var(--red) 0 5px, var(--paper) 5px 10px, var(--ink) 10px 15px, var(--paper) 15px 20px);
+}
+.motif-bars {
+  background: repeating-linear-gradient(0deg, var(--ink) 0 5px, var(--ochre) 5px 10px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

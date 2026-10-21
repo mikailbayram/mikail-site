@@ -1,0 +1,449 @@
+---
+import PixelArt from './PixelArt.astro';
+import { projects } from '../data/projects';
+import { portrait } from '../lib/pixels';
+
+const shipped = projects.filter((p) => p.kind === 'shipped');
+const data = projects.map(({ slug, name, oneLiner, role, url, stack, kind }) => ({ slug, name, oneLiner, role, url, stack, kind }));
+const chips = ['whoami', 'ls', 'cat stack', 'ask', 'cd system', 'help'];
+---
+
+<section id="terminal" class="term mono" aria-label="Interactive terminal">
+  <div class="tb">
+    <i style="background:var(--red)"></i><i style="background:var(--ochre)"></i><i style="background:var(--px-ink)"></i>
+    <span>~/mikail — zsh</span>
+  </div>
+  <div class="out" data-out aria-live="polite">
+    <div><span class="p">❯</span> whoami</div>
+    <div class="nf">
+      <PixelArt rows={portrait} class="nf-art" />
+      <dl>
+        <div class="who"><b>mikail</b>@<b>sarajevo</b></div>
+        <div class="rule" aria-hidden="true">────────────────</div>
+        <div><dt>role</dt><dd>full-stack AI engineer</dd></div>
+        <div><dt>uptime</dt><dd>8 years, mostly startups</dd></div>
+        <div><dt>stack</dt><dd>rails react node ts</dd></div>
+        <div><dt>os</dt><dd>omarchy</dd></div>
+        <div class="sw" aria-hidden="true"><i style="background:var(--red)"></i><i style="background:var(--ochre)"></i><i style="background:var(--term-fg)"></i><i style="background:#21708f"></i></div>
+      </dl>
+    </div>
+    <div><span class="p">❯</span> ls ~/shipped</div>
+    <div class="ls">
+      {shipped.map((p) => <a href={`/work/${p.slug}`}>{p.slug}/</a>)}
+      {projects.filter((p) => p.kind === 'side').map((p) => <a class="r" href={`/work/${p.slug}`}>{p.slug}/</a>)}
+    </div>
+  </div>
+  <form class="line" data-form autocomplete="off">
+    <label for="cmd" class="p">❯</label>
+    <input
+      id="cmd"
+      name="cmd"
+      data-input
+      type="text"
+      autocapitalize="off"
+      autocorrect="off"
+      spellcheck="false"
+      enterkeyhint="send"
+      placeholder="type help, or tap a command"
+      aria-label="Terminal command"
+    />
+  </form>
+  <div class="chips" role="group" aria-label="Quick commands">
+    {chips.map((c) => <button type="button" data-run={c}>{c}</button>)}
+  </div>
+  <template data-neofetch><div class="nf">
+      <PixelArt rows={portrait} class="nf-art" />
+      <dl>
+        <div class="who"><b>mikail</b>@<b>sarajevo</b></div>
+        <div class="rule" aria-hidden="true">────────────────</div>
+        <div><dt>role</dt><dd>full-stack AI engineer</dd></div>
+        <div><dt>uptime</dt><dd>8 years, mostly startups</dd></div>
+        <div><dt>stack</dt><dd>rails react node ts</dd></div>
+        <div><dt>os</dt><dd>omarchy</dd></div>
+        <div class="sw" aria-hidden="true"><i style="background:var(--red)"></i><i style="background:var(--ochre)"></i><i style="background:var(--term-fg)"></i><i style="background:#21708f"></i></div>
+      </dl>
+    </div></template>
+  <script type="application/json" data-projects set:html={JSON.stringify(data)} />
+</section>
+
+<script>
+  type P = { slug: string; name: string; oneLiner: string; role: string; url?: string; stack: string[]; kind: string };
+
+  const root = document.getElementById('terminal')!;
+  const out = root.querySelector<HTMLElement>('[data-out]')!;
+  const form = root.querySelector<HTMLFormElement>('[data-form]')!;
+  const input = root.querySelector<HTMLInputElement>('[data-input]')!;
+  const projects: P[] = JSON.parse(root.querySelector('[data-projects]')!.textContent || '[]');
+
+  const history: string[] = [];
+  let hIdx = 0;
+
+  type Part = string | { text: string; href?: string; cls?: string };
+  const line = (...parts: Part[]) => {
+    const div = document.createElement('div');
+    for (const part of parts) {
+      if (typeof part === 'string') div.append(part);
+      else {
+        const el = document.createElement(part.href ? 'a' : 'span');
+        el.textContent = part.text;
+        if (part.href && el instanceof HTMLAnchorElement) el.href = part.href;
+        if (part.cls) el.className = part.cls;
+        div.append(el);
+      }
+    }
+    out.append(div);
+  };
+  const dim = (text: string) => line({ text, cls: 'd' });
+
+  const ANSWERS: [RegExp, string][] = [
+    [/stack|tech|language|framework/i, 'TypeScript, React, Next.js, Node/NestJS, Rails, Python (FastAPI). PostgreSQL first. Deployed on GCP, AWS, Cloudflare and Vercel.'],
+    [/\bai\b|llm|rag|agent|claude|gpt|gemini/i, 'I ship LLM features to production: RAG with pgvector, document extraction, AI content generation. I also build with agents every day: Claude Code, MCP, and Playwright planner/generator/healer agents.'],
+    [/design|figma|token|\bui\b|\bux\b/i, 'I design my own products in a design system built in code: tokens, approved components, and a written log of design decisions. This site runs on one too. Try `cd system`.'],
+    [/where|location|remote|time ?zone|sarajevo/i, 'Sarajevo, Bosnia and Herzegovina (CET). I work remotely, including with a London venture studio since 2022.'],
+    [/hire|contact|email|available|work with/i, 'Email is best: mikail@solution404.io'],
+    [/experience|years|background|career/i, '8+ years, almost all with early-stage startups, often as the first or lead engineer. Try `cat linkifunnels`, or email me for my CV: mikail@solution404.io'],
+    [/test|playwright|quality/i, 'On Niscai I moved the team from Cypress to Playwright and set up an agent-driven testing workflow that grew the suite to 140+ end-to-end specs.'],
+  ];
+  let warnedAsk = false;
+
+  const go = (href: string) => {
+    dim(`→ ${href}`);
+    setTimeout(() => (window.location.href = href), 250);
+  };
+
+  const find = (q: string) => projects.find((p) => p.slug === q.replace(/\/$/, '') || p.name.toLowerCase() === q.toLowerCase());
+
+  const commands: Record<string, (args: string) => void> = {
+    help() {
+      dim('whoami · ls [side] · cat <project|stack> · open <project>');
+      dim('cd <work|system> · ask <question> · theme <dark|light> · clear');
+    },
+    whoami() {
+      const tpl = root.querySelector<HTMLTemplateElement>('[data-neofetch]')!;
+      out.append(tpl.content.cloneNode(true));
+    },
+    ls(args) {
+      const side = /side/.test(args);
+      const list = projects.filter((p) => (side ? p.kind === 'side' : true));
+      const div = document.createElement('div');
+      div.className = 'ls';
+      list.forEach((p) => {
+        const a = document.createElement('a');
+        a.href = `/work/${p.slug}`;
+        a.textContent = `${p.slug}/`;
+        if (p.kind === 'side') a.className = 'r';
+        div.append(a);
+      });
+      out.append(div);
+    },
+    cat(args) {
+      const q = args.trim();
+      if (q === 'stack') return commands.ask('stack');
+      const p = find(q);
+      if (!p) return dim(q ? `cat: ${q}: no such project. try \`ls\`` : 'usage: cat <project>');
+      line({ text: p.name, cls: 'p' }, ` · ${p.oneLiner}`);
+      dim(`${p.role} · ${p.stack.slice(0, 6).join(', ')}`);
+      line({ text: `open /work/${p.slug}`, href: `/work/${p.slug}` });
+    },
+    open(args) {
+      const q = args.trim();
+      if (/^cv(\.pdf)?$/.test(q)) return dim('my CV is not online. email me for it: mikail@solution404.io');
+      const p = find(q);
+      if (!p) return dim('usage: open <project>');
+      go(`/work/${p.slug}`);
+    },
+    cd(args) {
+      const q = args.trim().replace(/^~\/?/, '');
+      if (q === 'work' || q === '') return go('/#work');
+      if (q === 'system') return go('/system');
+      const p = find(q);
+      if (p) return go(`/work/${p.slug}`);
+      dim(`cd: no such directory: ${args.trim()}`);
+    },
+    ask(args) {
+      const q = args.trim();
+      if (!q) {
+        dim('ask me about my stack, AI work, design, testing, or where I work from.');
+        input.value = 'ask ';
+        input.focus();
+        return;
+      }
+      if (!warnedAsk) {
+        dim('(these are prewritten answers for now. a real AI chat is coming.)');
+        warnedAsk = true;
+      }
+      const hit = ANSWERS.find(([re]) => re.test(q));
+      line(hit ? hit[1] : "I don't have an answer for that one yet. Email me: mikail@solution404.io");
+    },
+    theme(args) {
+      const t = args.trim();
+      if (t !== 'dark' && t !== 'light') return dim('usage: theme <dark|light>');
+      document.documentElement.dataset.theme = t;
+      try {
+        localStorage.setItem('theme', t);
+      } catch {}
+      dim(`theme set to ${t}`);
+    },
+    clear() {
+      out.replaceChildren();
+    },
+    sudo() {
+      line({ text: 'nice try. this incident will be reported to the Sarajevo municipality.', cls: 'r' });
+    },
+  };
+
+  const run = (raw: string) => {
+    const cmdline = raw.trim();
+    if (!cmdline) return;
+    history.push(cmdline);
+    hIdx = history.length;
+    line({ text: '❯ ', cls: 'p' }, cmdline);
+    const [name, ...rest] = cmdline.split(/\s+/);
+    const fn = commands[name.toLowerCase()];
+    if (fn) fn(rest.join(' '));
+    else dim(`zsh: command not found: ${name}. try \`help\``);
+    out.scrollTop = out.scrollHeight;
+  };
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const v = input.value;
+    input.value = '';
+    run(v);
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowUp' && hIdx > 0) {
+      input.value = history[--hIdx];
+      e.preventDefault();
+    } else if (e.key === 'ArrowDown') {
+      hIdx = Math.min(history.length, hIdx + 1);
+      input.value = history[hIdx] ?? '';
+      e.preventDefault();
+    } else if (e.key === 'Tab') {
+      const [name, arg] = input.value.split(/\s+/);
+      if (arg !== undefined) {
+        const m = projects.find((p) => p.slug.startsWith(arg));
+        if (m) input.value = `${name} ${m.slug}`;
+      } else {
+        const m = Object.keys(commands).find((c) => c.startsWith(name));
+        if (m) input.value = `${m} `;
+      }
+      e.preventDefault();
+    }
+  });
+
+  // Chips run commands without opening the phone keyboard.
+  root.querySelectorAll<HTMLButtonElement>('[data-run]').forEach((b) =>
+    b.addEventListener('click', () => {
+      root.querySelectorAll('[data-run]').forEach((c) => c.classList.remove('on'));
+      b.classList.add('on');
+      run(b.dataset.run!);
+    }),
+  );
+
+  // "ask" links anywhere on the page jump here and start an ask.
+  const startAsk = () => {
+    root.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    input.value = 'ask ';
+    input.focus({ preventScroll: true });
+  };
+  document.querySelectorAll<HTMLAnchorElement>('[data-ask]').forEach((a) =>
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      startAsk();
+    }),
+  );
+  window.addEventListener('ask', startAsk);
+</script>
+
+<style>
+  .term {
+    background: var(--term-bg);
+    color: var(--term-fg);
+    border: var(--rule) solid var(--ink);
+    box-shadow: 6px 6px 0 var(--red);
+    font-size: 12.5px;
+    line-height: 1.75;
+    scroll-margin: 90px;
+  }
+  .tb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--paper);
+    color: var(--ink);
+    padding: 6px 10px;
+    border-bottom: var(--rule) solid var(--ink);
+    font-size: 11px;
+  }
+  .tb i {
+    width: 10px;
+    height: 10px;
+  }
+  .tb span {
+    margin-left: 6px;
+  }
+  .out {
+    padding: 14px 18px 0;
+    max-height: 300px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    overflow-wrap: anywhere;
+  }
+  .out :global(.p),
+  .p {
+    color: var(--ochre);
+  }
+  .out :global(.d) {
+    color: var(--term-dim);
+  }
+  .out :global(.r),
+  .out :global(.ls a.r) {
+    color: var(--term-hl);
+  }
+  .out :global(a) {
+    color: inherit;
+    text-decoration-color: #ffffff40;
+    text-underline-offset: 3px;
+  }
+  .out :global(.ls) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 16px;
+  }
+  .out :global(.ls a) {
+    text-decoration: none;
+  }
+  .out :global(.ls a:hover) {
+    text-decoration: underline;
+  }
+  .out :global(.nf) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 22px;
+    margin: 8px 0 10px;
+  }
+  .out :global(.nf-art) {
+    width: 128px;
+    height: auto;
+    flex: none;
+  }
+  .out :global(.nf dl) {
+    margin: 0;
+    min-width: 0;
+  }
+  .out :global(.nf dl > div) {
+    display: flex;
+    gap: 10px;
+  }
+  .out :global(.nf dt) {
+    color: var(--ochre);
+    width: 6ch;
+    flex: none;
+  }
+  .out :global(.nf dd) {
+    margin: 0;
+  }
+  .out :global(.nf dl > .who) {
+    display: block;
+  }
+  .out :global(.nf .who b) {
+    color: var(--ochre);
+    font-weight: 600;
+  }
+  .out :global(.nf .rule) {
+    color: var(--term-dim);
+  }
+  .out :global(.nf .sw) {
+    gap: 0;
+    margin-top: 6px;
+  }
+  .out :global(.nf .sw i) {
+    width: 20px;
+    height: 12px;
+  }
+  .line {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 4px 18px 0;
+  }
+  input {
+    flex: 1;
+    min-width: 0;
+    font: inherit;
+    color: var(--term-fg);
+    background: transparent;
+    border: 0;
+    padding: 6px 0;
+    caret-color: var(--ochre);
+    outline: none;
+  }
+  input::placeholder {
+    color: #ffffff45;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 18px 16px;
+  }
+  .chips button {
+    font: inherit;
+    font-size: 11px;
+    color: var(--term-fg);
+    background: transparent;
+    border: 1.5px solid #ffffff40;
+    padding: 6px 10px;
+    min-height: 36px;
+    cursor: pointer;
+  }
+  .chips button:hover {
+    border-color: var(--ochre);
+  }
+  .chips button.on {
+    background: var(--ochre);
+    border-color: var(--ochre);
+    color: var(--px-ink);
+  }
+  @media (pointer: coarse) {
+    input {
+      font-size: 16px; /* stops iOS from zooming in on focus */
+    }
+    .chips button {
+      min-height: 40px;
+    }
+  }
+  @media (max-width: 680px) {
+    .term {
+      font-size: 11.5px;
+      box-shadow: 4px 4px 0 var(--red);
+    }
+    .out {
+      padding: 12px 14px 0;
+      max-height: 300px;
+    }
+    .out {
+      max-height: 340px;
+    }
+    .out :global(.nf-art) {
+      width: 56px;
+    }
+    .out :global(.nf) {
+      flex-wrap: nowrap;
+      gap: 12px;
+      font-size: 10.5px;
+    }
+    .out :global(.nf dl > div) {
+      gap: 6px;
+    }
+    .line {
+      padding: 4px 14px 0;
+    }
+    .chips {
+      padding: 8px 14px 14px;
+    }
+  }
+</style>

@@ -1,0 +1,216 @@
+---
+import Base from '../layouts/Base.astro';
+import PixelArt from '../components/PixelArt.astro';
+import { portrait, sebilj, walker } from '../lib/pixels';
+
+const colors = [
+  { token: '--paper', role: 'Background' },
+  { token: '--ink', role: 'Text, rules, borders' },
+  { token: '--red', role: 'Accent, links, labels' },
+  { token: '--ochre', role: 'Highlight, prompt, focus' },
+  { token: '--soft', role: 'Secondary text' },
+  { token: '--term-bg', role: 'Terminal surface' },
+];
+
+const type = [
+  { name: 'Display / hero', css: 'font-size:clamp(40px,8vw,72px);font-weight:800;letter-spacing:-0.05em;line-height:.9', text: 'Mikail' },
+  { name: 'Heading / h2', css: 'font-size:32px;font-weight:800;letter-spacing:-0.03em', text: 'From prototype to production.' },
+  { name: 'Body', css: 'font-size:16px;line-height:1.6', text: 'I take startup ideas from first prototype to production.' },
+  { name: 'Mono / terminal', css: 'font-family:var(--font-mono);font-size:12.5px', text: '❯ ls ~/shipped' },
+];
+
+const motifs = ['diamonds', 'zigzag', 'stripes', 'bars'];
+
+const decisions = [
+  'Pixel art is drawn on a grid, the same way a ćilim is woven. Everything visual comes from that one idea.',
+  'The portrait is drawn from a photo on a 32×32 grid. Skin, hair and the teal hoodie keep fixed colors in both themes; everything else follows the tokens.',
+  'Four colors only. Each project gets a woven motif instead of a stock screenshot.',
+  'Borders are 2px solid ink. Shadows are offset blocks, never blurred.',
+  'Every pixel color is a CSS variable, so dark mode re-dyes the art instead of swapping images.',
+  'On phones, the terminal runs on tappable chips so the keyboard only opens for "ask".',
+];
+---
+
+<Base title="System · Mikail Bayram" description="The design system behind this site: tokens, type, motifs and decisions, all in code." path="~/system">
+  <div class="wrap page">
+    <p class="kick">// ~/system</p>
+    <h1>The design system.</h1>
+    <p class="sub">I design in code instead of Figma. This page is generated from the same tokens and components the site uses.</p>
+
+    <section>
+      <h2 class="h3 mono">color tokens</h2>
+      <ul class="swatches">
+        {
+          colors.map((c) => (
+            <li>
+              <i style={`background:var(${c.token})`} />
+              <code>{c.token}</code>
+              <span>{c.role}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="h3 mono">type</h2>
+      <ul class="type">
+        {
+          type.map((t) => (
+            <li>
+              <span class="lbl mono">{t.name}</span>
+              <span style={t.css}>{t.text}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="h3 mono">woven motifs</h2>
+      <ul class="motifs">
+        {
+          motifs.map((m) => (
+            <li>
+              <div class:list={['sw', `motif-${m}`]} />
+              <code>.motif-{m}</code>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="h3 mono">pixel art</h2>
+      <div class="pixels">
+        <figure><PixelArt rows={sebilj} width={126} height={138} label="Sebilj" /><figcaption class="mono">sebilj · 21×23</figcaption></figure>
+        <figure><PixelArt rows={sebilj} width={21} height={23} /><figcaption class="mono">favicon · 1×</figcaption></figure>
+        <figure><PixelArt rows={portrait} width={128} height={128} label="Portrait" /><figcaption class="mono">portrait · 32×32</figcaption></figure>
+        <figure><PixelArt rows={walker} width={63} height={99} label="Walker" /><figcaption class="mono">walker · 7×11</figcaption></figure>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="h3 mono">decision log</h2>
+      <ol class="log">
+        {decisions.map((d) => <li>{d}</li>)}
+      </ol>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .page {
+    padding-top: clamp(24px, 5vw, 56px);
+  }
+  h1 {
+    font-size: clamp(40px, 8vw, 80px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    font-weight: 800;
+    margin: 0 0 12px;
+    font-variation-settings: 'opsz' 96;
+  }
+  section {
+    margin-top: 44px;
+  }
+  .h3 {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--red);
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: var(--rule) solid var(--ink);
+  }
+  ul,
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 14px;
+  }
+  .swatches i {
+    display: block;
+    height: 64px;
+    border: var(--rule) solid var(--ink);
+    margin-bottom: 8px;
+  }
+  .swatches code {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  .swatches span {
+    font-size: 13px;
+    color: var(--soft);
+  }
+  .type li {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 16px;
+    align-items: baseline;
+    padding: 14px 0;
+    border-bottom: 1px dashed color-mix(in srgb, var(--ink) 30%, transparent);
+  }
+  .lbl {
+    font-size: 11px;
+    color: var(--soft);
+  }
+  .motifs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 14px;
+  }
+  .motifs .sw {
+    height: 80px;
+    border: var(--rule) solid var(--ink);
+    margin-bottom: 6px;
+  }
+  .motifs code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .pixels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    align-items: end;
+  }
+  figure {
+    margin: 0;
+  }
+  figcaption {
+    font-size: 11px;
+    color: var(--soft);
+    margin-top: 8px;
+  }
+  .log {
+    counter-reset: d;
+  }
+  .log li {
+    counter-increment: d;
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    padding: 12px 0;
+    font-size: 16px;
+    line-height: 1.55;
+    border-bottom: 1px dashed color-mix(in srgb, var(--ink) 30%, transparent);
+  }
+  .log li::before {
+    content: counter(d, decimal-leading-zero);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--red);
+    padding-top: 4px;
+  }
+  @media (max-width: 680px) {
+    .type li {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+  }
+</style>

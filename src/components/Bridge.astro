@@ -1,0 +1,75 @@
+---
+import { BRIDGE, bridge, deckTop, size, toRects, walker } from '../lib/pixels';
+
+const { w: ww, h: wh } = size(walker);
+const startX = 46;
+const startY = deckTop(startX + Math.floor(ww / 2)) - wh;
+---
+
+<div class="bridge" data-bridge>
+  <svg class="pixel" viewBox={`0 0 ${BRIDGE.W} ${BRIDGE.H}`} role="img" aria-label="Pixel-art Stari Most bridge in Mostar, with a tiny Mikail carrying a project across">
+    <Fragment set:html={toRects(bridge())} />
+    <g data-walker transform={`translate(${startX} ${startY})`}>
+      <Fragment set:html={toRects(walker)} />
+    </g>
+  </svg>
+  <div class="banks mono"><b>prototype</b><b>production</b></div>
+</div>
+
+<script>
+  import { deckTop, size, walker as sprite } from '../lib/pixels';
+
+  const root = document.querySelector<HTMLElement>('[data-bridge]');
+  const walker = root?.querySelector<SVGGElement>('[data-walker]');
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (root && walker && !still.matches) {
+    const { w: ww, h: wh } = size(sprite);
+    const FROM = 15;
+    const TO = 81 - ww;
+    let queued = false;
+
+    const place = () => {
+      queued = false;
+      const r = root.getBoundingClientRect();
+      const vh = window.innerHeight;
+      // 0 when the bridge enters at the bottom, 1 when it reaches the upper third.
+      const p = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.75)));
+      const x = Math.round(FROM + p * (TO - FROM));
+      const y = deckTop(x + Math.floor(ww / 2)) - wh; // feet on the deck
+      walker.setAttribute('transform', `translate(${x} ${y})`);
+    };
+
+    const onScroll = () => {
+      if (!queued) {
+        queued = true;
+        requestAnimationFrame(place);
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    place();
+  }
+</script>
+
+<style>
+  .bridge {
+    max-width: 820px;
+  }
+  svg {
+    width: 100%;
+    height: auto;
+  }
+  .banks {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    margin-top: 8px;
+  }
+  .banks b {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 3px 8px;
+    font-weight: 400;
+  }
+</style>

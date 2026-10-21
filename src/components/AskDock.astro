@@ -1,0 +1,71 @@
+<!-- Phones only: a thumb-height prompt that appears once the terminal scrolls out of view. -->
+<button class="dock mono" type="button" data-dock aria-label="Ask about my work" hidden>
+  <span><b>❯</b> ask me anything…</span>
+  <span class="go" aria-hidden="true">↵</span>
+</button>
+
+<script>
+  const dock = document.querySelector<HTMLButtonElement>('[data-dock]')!;
+  const term = document.getElementById('terminal');
+  const phone = window.matchMedia('(max-width: 680px)');
+
+  if (term) {
+    dock.hidden = false;
+    const io = new IntersectionObserver(([e]) => {
+      // Show only after the terminal has scrolled up past the top, not before reaching it.
+      const past = !e.isIntersecting && e.boundingClientRect.top < 0;
+      dock.classList.toggle('show', past && phone.matches);
+    });
+    io.observe(term);
+    dock.addEventListener('click', () => window.dispatchEvent(new Event('ask')));
+  }
+</script>
+
+<style>
+  .dock {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: max(14px, env(safe-area-inset-bottom));
+    z-index: 20;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 52px;
+    padding: 0 14px;
+    font: inherit;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-align: left;
+    color: var(--term-dim);
+    background: var(--term-bg);
+    border: var(--rule) solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ochre);
+    cursor: pointer;
+    transform: translateY(140%);
+    visibility: hidden;
+    transition:
+      transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+      visibility 0s 0.25s;
+  }
+  .dock.show {
+    transform: none;
+    visibility: visible;
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .dock b {
+    color: var(--ochre);
+    font-weight: 400;
+  }
+  .go {
+    background: var(--ochre);
+    color: var(--px-ink);
+    padding: 4px 9px;
+    font-weight: 600;
+  }
+  @media (min-width: 681px) {
+    .dock {
+      display: none;
+    }
+  }
+</style>

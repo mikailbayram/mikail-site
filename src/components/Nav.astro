@@ -1,0 +1,234 @@
+---
+import PixelArt from './PixelArt.astro';
+import { sebilj } from '../lib/pixels';
+
+interface Props {
+  path?: string;
+}
+const { path = '~' } = Astro.props;
+const current = Astro.url.pathname;
+
+const links = [
+  { href: '/#work', label: 'work', hint: 'projects', match: '/work' },
+  { href: '/system', label: 'system', hint: 'design tokens', match: '/system' },
+  { href: '/#terminal', label: 'ask', hint: 'ask about my work', ask: true },
+  { href: 'mailto:mikail@solution404.io', label: 'mail', hint: 'say hi' },
+];
+---
+
+<nav class="nav mono">
+  <div class="wrap row">
+    <a href="/" class="logo" aria-label="Home">
+      <PixelArt rows={sebilj} width={22} height={24} />
+      <span class="prompt"><span class="host">mikail@sarajevo:</span><span class="path">{path}</span>$</span>
+    </a>
+    <ul class="links">
+      {
+        links.slice(0, 4).map((l) => (
+          <li>
+            <a href={l.href} class:list={{ on: l.match && current.startsWith(l.match) }} data-ask={l.ask ? '' : undefined}>
+              {l.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <button class="menu" type="button" aria-haspopup="dialog" data-open-sheet>≡ cmd</button>
+  </div>
+</nav>
+
+<dialog class="sheet mono" aria-label="Navigation">
+  <div class="bnd" aria-hidden="true"></div>
+  <form method="dialog" class="q">
+    <span><b>❯</b> cd <span class="cur" aria-hidden="true"></span></span>
+    <button class="close" aria-label="Close menu">esc</button>
+  </form>
+  <ul>
+    {
+      links.map((l) => (
+        <li>
+          <a href={l.href} data-ask={l.ask ? '' : undefined}>
+            <span>{l.label === 'work' || l.label === 'system' ? `~/${l.label}` : l.label}</span>
+            <span class="hint">{l.hint}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</dialog>
+
+<script>
+  const sheet = document.querySelector<HTMLDialogElement>('dialog.sheet')!;
+  document.querySelector('[data-open-sheet]')?.addEventListener('click', () => sheet.showModal());
+  sheet.addEventListener('click', (e) => {
+    if (e.target === sheet) sheet.close(); // tap on backdrop
+  });
+  sheet.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => sheet.close()));
+</script>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--paper);
+    border-bottom: var(--rule) solid var(--ink);
+    font-size: 12px;
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 56px;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .logo {
+    min-width: 0;
+  }
+  .prompt {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .path {
+    color: var(--red);
+  }
+  .links {
+    display: flex;
+    gap: 6px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .links a {
+    display: block;
+    padding: 6px 8px;
+    text-decoration: none;
+  }
+  .links a:hover {
+    color: var(--red);
+  }
+  .links a.on {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .menu {
+    display: none;
+    font: inherit;
+    font-weight: 600;
+    color: var(--ink);
+    background: none;
+    border: var(--rule) solid var(--ink);
+    padding: 8px 10px;
+    min-height: 40px;
+    cursor: pointer;
+  }
+
+  .sheet {
+    margin: auto 0 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 85dvh;
+    padding: 0 0 max(24px, env(safe-area-inset-bottom));
+    border: 0;
+    border-top: 3px solid var(--ochre);
+    background: var(--term-bg);
+    color: var(--term-fg);
+  }
+  .sheet[open] {
+    animation: up 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .sheet::backdrop {
+    background: color-mix(in srgb, var(--px-ink) 60%, transparent);
+  }
+  @keyframes up {
+    from {
+      transform: translateY(100%);
+    }
+  }
+  .bnd {
+    height: 12px;
+    background: repeating-linear-gradient(90deg, var(--red) 0 8px, var(--term-bg) 8px 12px, var(--ochre) 12px 20px, var(--term-bg) 20px 24px);
+  }
+  .q {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px 8px;
+    font-size: 12px;
+    color: var(--term-dim);
+  }
+  .q b {
+    color: var(--ochre);
+    font-weight: 400;
+  }
+  .close {
+    font: inherit;
+    font-size: 11px;
+    color: var(--term-dim);
+    background: none;
+    border: 1px solid #ffffff30;
+    padding: 6px 10px;
+    min-height: 36px;
+  }
+  .sheet ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .sheet a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 52px;
+    padding: 0 18px;
+    border-top: 1px solid #ffffff1a;
+    font-size: 14px;
+    text-decoration: none;
+  }
+  .sheet a:active {
+    background: #ffffff10;
+    color: var(--ochre);
+  }
+  .hint {
+    font-size: 11px;
+    color: var(--term-dim);
+  }
+  .cur {
+    display: inline-block;
+    width: 7px;
+    height: 13px;
+    background: var(--ochre);
+    vertical-align: -2px;
+    animation: bl 1s steps(1) infinite;
+  }
+  @keyframes bl {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .links {
+      display: none;
+    }
+    .menu {
+      display: block;
+      flex: none;
+      white-space: nowrap;
+      margin-left: 12px;
+    }
+    .host {
+      display: none;
+    }
+    .prompt {
+      font-size: 12px;
+    }
+  }
+</style>
